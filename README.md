@@ -16,13 +16,13 @@ clog silently logs everything so you never lose track.
 
 ### Linux / Mac
 ```bash
-curl -sSL https://raw.githubusercontent.com/hasanraza38/clog/master/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/hasanraza38/clog/main/install.sh | bash
 source ~/.zshrc   # or source ~/.bashrc
 ```
 
 ### Windows (PowerShell)
 ```powershell
-irm https://raw.githubusercontent.com/hasanraza38/clog/master/install.ps1 | iex
+irm https://raw.githubusercontent.com/hasanraza38/clog/main/install.ps1 | iex
 ```
 
 ---
@@ -96,12 +96,12 @@ Open `.clog` in **VS Code, Vim, Nano, Notepad++** — any text editor works.
 
 ### Linux / Mac
 ```bash
-curl -sSL https://raw.githubusercontent.com/hasanraza38/clog/master/uninstall.sh | bash
+curl -sSL https://raw.githubusercontent.com/hasanraza38/clog/main/uninstall.sh | bash
 ```
 
 ### Windows (PowerShell)
 ```powershell
-irm https://raw.githubusercontent.com/hasanraza38/clog/master/uninstall.ps1 | iex
+irm https://raw.githubusercontent.com/hasanraza38/clog/main/uninstall.ps1 | iex
 ```
 
 ---
