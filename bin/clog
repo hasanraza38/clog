@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 CLOG_VERSION="1.0.0"
-CLOG_FILE=".clog"
+CLOG_FILE=".clog.log"
 CLOG_MARKER=".clog_init"
 
 _is_initialized() {
@@ -20,13 +20,13 @@ cmd_init() {
   local ts
   ts=$(date '+%Y-%m-%d %H:%M:%S')
 
-  echo "# clog initialized on $ts"              >> "$CLOG_FILE"
-  echo "# Directory: $(pwd)"                    >> "$CLOG_FILE"
-  echo "# ──────────────────────────────────"   >> "$CLOG_FILE"
-  echo ""                                        >> "$CLOG_FILE"
+  echo "# clog initialized on $ts"            >> "$CLOG_FILE"
+  echo "# Directory: $(pwd)"                  >> "$CLOG_FILE"
+  echo "# ──────────────────────────────────" >> "$CLOG_FILE"
+  echo ""                                      >> "$CLOG_FILE"
 
   echo "✔  clog initialized in $(pwd)"
-  echo "   Commands will be saved to .clog"
+  echo "   Commands will be saved to .clog.log"
 }
 
 cmd_show() {
@@ -70,6 +70,7 @@ cmd_status() {
     count=$(grep -c "^\[" "$CLOG_FILE" 2>/dev/null || echo 0)
     echo "✔  clog active in $(pwd)"
     echo "   Commands logged: $count"
+    echo "   Log file: $(pwd)/.clog.log"
   else
     echo "✘  clog not initialized here."
     echo "   Run: clog init"
@@ -90,18 +91,33 @@ cmd_clear() {
   fi
 }
 
+cmd_uninit() {
+  if ! _is_initialized; then
+    echo "✘  clog not initialized here."
+    exit 1
+  fi
+  read -r -p "⚠  Remove clog from $(pwd)? Deletes .clog.log and .clog_init [y/N] " confirm
+  if [[ "$confirm" =~ ^[Yy]$ ]]; then
+    rm -f "$CLOG_FILE" "$CLOG_MARKER"
+    echo "✔  clog removed from $(pwd)"
+  else
+    echo "  Cancelled."
+  fi
+}
+
 cmd_help() {
   echo ""
   echo "  clog v$CLOG_VERSION — per-directory command logger"
   echo ""
   echo "  COMMANDS"
-  echo "    clog init          Start logging in this directory"
-  echo "    clog show          Print the full log"
-  echo "    clog last [n]      Show last n commands (default 10)"
-  echo "    clog search <term> Search the log"
-  echo "    clog status        Check if clog is active here"
-  echo "    clog clear         Wipe the log"
-  echo "    clog help          Show this help"
+  echo "    clog init            Start logging in this directory"
+  echo "    clog show            Print the full log"
+  echo "    clog last [n]        Show last n commands (default 10)"
+  echo "    clog search <term>   Search the log"
+  echo "    clog status          Check if clog is active here"
+  echo "    clog clear           Wipe the log"
+  echo "    clog uninit          Remove clog from this directory"
+  echo "    clog help            Show this help"
   echo ""
 }
 
@@ -112,6 +128,7 @@ case "$1" in
   search)  cmd_search "$2" ;;
   status)  cmd_status ;;
   clear)   cmd_clear ;;
+  uninit)  cmd_uninit ;;
   help|--help|-h) cmd_help ;;
   "")      cmd_help ;;
   *)

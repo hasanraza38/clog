@@ -1,11 +1,21 @@
+
+
 #!/usr/bin/env bash
 
-CLOG_HOME="$HOME/.clog"
-BIN_TARGET="/usr/local/bin/clog"
-HOOK_LINE="source \"$HOME/.clog/clog_hook.sh\"  # clog hook"
+CLOG_HOME="$HOME/.clog_home"
+HOOK_LINE="source \"$HOME/.clog_home/clog_hook.sh\"  # clog hook"
+
+# ── Detect OS ────────────────────────────
+OS="unknown"
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  OS="linux"
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  OS="mac"
+fi
 
 echo ""
 echo "  Installing clog..."
+echo "  Detected OS: $OS"
 echo ""
 
 # 1. Create clog home directory
@@ -16,9 +26,9 @@ cp clog_hook.sh "$CLOG_HOME/clog_hook.sh"
 echo "  ✔  Hook installed → $CLOG_HOME/clog_hook.sh"
 
 # 3. Install CLI binary
-if cp bin/clog "$BIN_TARGET" 2>/dev/null; then
-  chmod +x "$BIN_TARGET"
-  echo "  ✔  CLI installed  → $BIN_TARGET"
+if cp bin/clog "/usr/local/bin/clog" 2>/dev/null; then
+  chmod +x "/usr/local/bin/clog"
+  echo "  ✔  CLI installed  → /usr/local/bin/clog"
 else
   mkdir -p "$HOME/bin"
   cp bin/clog "$HOME/bin/clog"
@@ -41,8 +51,14 @@ _add_to_shell() {
   fi
 }
 
-_add_to_shell "$HOME/.zshrc"
-_add_to_shell "$HOME/.bashrc"
+if [ "$OS" == "linux" ]; then
+  _add_to_shell "$HOME/.zshrc"
+  _add_to_shell "$HOME/.bashrc"
+elif [ "$OS" == "mac" ]; then
+  _add_to_shell "$HOME/.zshrc"
+  _add_to_shell "$HOME/.bash_profile"
+  _add_to_shell "$HOME/.bashrc"
+fi
 
 # 5. Add to global gitignore
 GLOBAL_GITIGNORE="$HOME/.gitignore_global"
@@ -54,15 +70,19 @@ if ! grep -q "^\.clog$" "$GLOBAL_GITIGNORE"; then
 fi
 git config --global core.excludesfile "$GLOBAL_GITIGNORE" 2>/dev/null || true
 
-echo ""g
-echo "   clog installed!"
 echo ""
-echo "  NEXT — reload your shell:"
-echo "    source ~/.zshrc    (zsh)"
-echo "    source ~/.bashrc   (bash)"
+echo "  ✅  clog installed successfully!"
+echo ""
+if [ "$OS" == "mac" ]; then
+  echo "  NEXT — reload your shell:"
+  echo "    source ~/.zshrc"
+else
+  echo "  NEXT — reload your shell:"
+  echo "    source ~/.zshrc    (zsh)"
+  echo "    source ~/.bashrc   (bash)"
+fi
 echo ""
 echo "  THEN:"
 echo "    cd your-project"
 echo "    clog init"
 echo ""
-
