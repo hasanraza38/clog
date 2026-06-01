@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 CLOG_HOME="$HOME/.clog_home"
+GITHUB_RAW="https://raw.githubusercontent.com/hasanraza38/clog/master"
 HOOK_LINE="source \"$HOME/.clog_home/clog_hook.sh\"  # clog hook"
 
 # ── Detect OS ────────────────────────────
@@ -13,7 +14,6 @@ elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]];
   OS="windows"
 fi
 
-
 echo ""
 echo "  Installing clog..."
 echo "  Detected OS: $OS"
@@ -21,24 +21,27 @@ echo ""
 
 # 1. Create clog home directory
 mkdir -p "$CLOG_HOME"
+mkdir -p "$HOME/bin"
 
-# 2. Copy hook file
-cp clog_hook.sh "$CLOG_HOME/clog_hook.sh"
+# 2. Download hook file
+curl -sSL "$GITHUB_RAW/clog_hook.sh" -o "$CLOG_HOME/clog_hook.sh"
 echo "  ✔  Hook installed → $CLOG_HOME/clog_hook.sh"
 
-# 3. Install CLI binary
-if cp bin/clog "/usr/local/bin/clog" 2>/dev/null; then
-  chmod +x "/usr/local/bin/clog"
-  echo "  ✔  CLI installed  → /usr/local/bin/clog"
-else
-  mkdir -p "$HOME/bin"
-  cp bin/clog "$HOME/bin/clog"
-  chmod +x "$HOME/bin/clog"
-  echo "  ✔  CLI installed  → $HOME/bin/clog"
-  echo "     (no sudo — installed to ~/bin)"
+# 3. Download CLI binary
+curl -sSL "$GITHUB_RAW/bin/clog" -o "$HOME/bin/clog"
+chmod +x "$HOME/bin/clog"
+echo "  ✔  CLI installed  → $HOME/bin/clog"
+
+# 4. Add ~/bin to PATH if needed
+if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
+  echo "" >> "$HOME/.zshrc"
+  echo "export PATH=\"\$HOME/bin:\$PATH\"  # clog path" >> "$HOME/.zshrc"
+  echo "" >> "$HOME/.bashrc"
+  echo "export PATH=\"\$HOME/bin:\$PATH\"  # clog path" >> "$HOME/.bashrc"
+  echo "  ✔  Added ~/bin to PATH"
 fi
 
-# 4. Add hook to shell configs
+# 5. Add hook to shell configs
 _add_to_shell() {
   local rc_file="$1"
   if [ -f "$rc_file" ]; then
@@ -60,13 +63,11 @@ elif [ "$OS" == "mac" ]; then
   _add_to_shell "$HOME/.bash_profile"
   _add_to_shell "$HOME/.bashrc"
 elif [ "$OS" == "windows" ]; then
-  # Git Bash on Windows uses .bashrc
   _add_to_shell "$HOME/.bashrc"
-  # Also check for .bash_profile
   _add_to_shell "$HOME/.bash_profile"
 fi
 
-# 5. Add to global gitignore
+# 6. Add to global gitignore
 GLOBAL_GITIGNORE="$HOME/.gitignore_global"
 touch "$GLOBAL_GITIGNORE"
 if ! grep -q "^\.clog$" "$GLOBAL_GITIGNORE"; then
@@ -79,7 +80,6 @@ git config --global core.excludesfile "$GLOBAL_GITIGNORE" 2>/dev/null || true
 echo ""
 echo "   clog installed successfully!"
 echo ""
-
 if [ "$OS" == "mac" ]; then
   echo "  NEXT — reload your shell:"
   echo "    source ~/.zshrc"
@@ -91,7 +91,6 @@ else
   echo "    source ~/.zshrc    (zsh)"
   echo "    source ~/.bashrc   (bash)"
 fi
-
 echo ""
 echo "  THEN:"
 echo "    cd your-project"

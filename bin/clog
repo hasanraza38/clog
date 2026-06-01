@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CLOG_VERSION="1.0.0"
+CLOG_VERSION="1.0.1"
 CLOG_FILE=".clog"
 CLOG_MARKER=".clog_init"
 
