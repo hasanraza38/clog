@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+
+CLOG_VERSION="1.0.0"
+CLOG_FILE=".clog"
+CLOG_MARKER=".clog_init"
+
+_is_initialized() {
+  [ -f "$CLOG_MARKER" ]
+}
+
+cmd_init() {
+  if _is_initialized; then
+    echo "⚠  clog already initialized here."
+    exit 0
+  fi
+
+  touch "$CLOG_MARKER"
+  touch "$CLOG_FILE"
+
+  local ts
+  ts=$(date '+%Y-%m-%d %H:%M:%S')
+
+  echo "# clog initialized on $ts"              >> "$CLOG_FILE"
+  echo "# Directory: $(pwd)"                    >> "$CLOG_FILE"
+  echo "# ──────────────────────────────────"   >> "$CLOG_FILE"
+  echo ""                                        >> "$CLOG_FILE"
+
+  echo "✔  clog initialized in $(pwd)"
+  echo "   Commands will be saved to .clog"
+}
+
+cmd_show() {
+  if ! _is_initialized; then
+    echo "✘  Not initialized. Run: clog init"
+    exit 1
+  fi
+  cat "$CLOG_FILE"
+}
+
+cmd_last() {
+  if ! _is_initialized; then
+    echo "✘  Not initialized. Run: clog init"
+    exit 1
+  fi
+  local n="${1:-10}"
+  grep "^\[" "$CLOG_FILE" | tail -n "$n"
+}
+
+cmd_search() {
+  if ! _is_initialized; then
+    echo "✘  Not initialized. Run: clog init"
+    exit 1
+  fi
+  if [ -z "$1" ]; then
+    echo "Usage: clog search <term>"
+    exit 1
+  fi
+  local results
+  results=$(grep -i "$1" "$CLOG_FILE")
+  if [ -z "$results" ]; then
+    echo "  No results for \"$1\""
+  else
+    echo "$results"
+  fi
+}
+
+cmd_status() {
+  if _is_initialized; then
+    local count
+    count=$(grep -c "^\[" "$CLOG_FILE" 2>/dev/null || echo 0)
+    echo "✔  clog active in $(pwd)"
+    echo "   Commands logged: $count"
+  else
+    echo "✘  clog not initialized here."
+    echo "   Run: clog init"
+  fi
+}
+
+cmd_clear() {
+  if ! _is_initialized; then
+    echo "✘  Not initialized. Run: clog init"
+    exit 1
+  fi
+  read -r -p "⚠  Clear the log? [y/N] " confirm
+  if [[ "$confirm" =~ ^[Yy]$ ]]; then
+    echo "" > "$CLOG_FILE"
+    echo "✔  Log cleared."
+  else
+    echo "  Cancelled."
+  fi
+}
+
+cmd_help() {
+  echo ""
+  echo "  clog v$CLOG_VERSION — per-directory command logger"
+  echo ""
+  echo "  COMMANDS"
+  echo "    clog init          Start logging in this directory"
+  echo "    clog show          Print the full log"
+  echo "    clog last [n]      Show last n commands (default 10)"
+  echo "    clog search <term> Search the log"
+  echo "    clog status        Check if clog is active here"
+  echo "    clog clear         Wipe the log"
+  echo "    clog help          Show this help"
+  echo ""
+}
+
+case "$1" in
+  init)    cmd_init ;;
+  show)    cmd_show ;;
+  last)    cmd_last "$2" ;;
+  search)  cmd_search "$2" ;;
+  status)  cmd_status ;;
+  clear)   cmd_clear ;;
+  help|--help|-h) cmd_help ;;
+  "")      cmd_help ;;
+  *)
+    echo "✘  Unknown command: $1"
+    echo "   Run: clog help"
+    exit 1
+    ;;
+esac
