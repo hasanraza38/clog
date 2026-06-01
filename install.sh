@@ -1,5 +1,3 @@
-
-
 #!/usr/bin/env bash
 
 CLOG_HOME="$HOME/.clog_home"
@@ -11,7 +9,10 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   OS="linux"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   OS="mac"
+elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
+  OS="windows"
 fi
+
 
 echo ""
 echo "  Installing clog..."
@@ -58,6 +59,11 @@ elif [ "$OS" == "mac" ]; then
   _add_to_shell "$HOME/.zshrc"
   _add_to_shell "$HOME/.bash_profile"
   _add_to_shell "$HOME/.bashrc"
+elif [ "$OS" == "windows" ]; then
+  # Git Bash on Windows uses .bashrc
+  _add_to_shell "$HOME/.bashrc"
+  # Also check for .bash_profile
+  _add_to_shell "$HOME/.bash_profile"
 fi
 
 # 5. Add to global gitignore
@@ -73,14 +79,19 @@ git config --global core.excludesfile "$GLOBAL_GITIGNORE" 2>/dev/null || true
 echo ""
 echo "  ✅  clog installed successfully!"
 echo ""
+
 if [ "$OS" == "mac" ]; then
   echo "  NEXT — reload your shell:"
   echo "    source ~/.zshrc"
+elif [ "$OS" == "windows" ]; then
+  echo "  NEXT — restart Git Bash or run:"
+  echo "    source ~/.bashrc"
 else
   echo "  NEXT — reload your shell:"
   echo "    source ~/.zshrc    (zsh)"
   echo "    source ~/.bashrc   (bash)"
 fi
+
 echo ""
 echo "  THEN:"
 echo "    cd your-project"

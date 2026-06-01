@@ -8,6 +8,8 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   OS="linux"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   OS="mac"
+elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
+  OS="windows"
 fi
 
 echo ""
@@ -49,6 +51,9 @@ elif [ "$OS" == "mac" ]; then
   _remove_from_shell "$HOME/.zshrc"
   _remove_from_shell "$HOME/.bash_profile"
   _remove_from_shell "$HOME/.bashrc"
+elif [ "$OS" == "windows" ]; then
+  _remove_from_shell "$HOME/.bashrc"
+  _remove_from_shell "$HOME/.bash_profile"
 fi
 
 echo ""

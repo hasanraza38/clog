@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 CLOG_VERSION="1.0.0"
-CLOG_FILE=".clog.log"
+CLOG_FILE=".clog"
 CLOG_MARKER=".clog_init"
 
 _is_initialized() {
@@ -26,7 +26,7 @@ cmd_init() {
   echo ""                                      >> "$CLOG_FILE"
 
   echo "✔  clog initialized in $(pwd)"
-  echo "   Commands will be saved to .clog.log"
+  echo "   Commands will be saved to .clog"
 }
 
 cmd_show() {
@@ -70,7 +70,7 @@ cmd_status() {
     count=$(grep -c "^\[" "$CLOG_FILE" 2>/dev/null || echo 0)
     echo "✔  clog active in $(pwd)"
     echo "   Commands logged: $count"
-    echo "   Log file: $(pwd)/.clog.log"
+    echo "   Log file: $(pwd)/.clog"
   else
     echo "✘  clog not initialized here."
     echo "   Run: clog init"
@@ -96,7 +96,7 @@ cmd_uninit() {
     echo "✘  clog not initialized here."
     exit 1
   fi
-  read -r -p "⚠  Remove clog from $(pwd)? Deletes .clog.log and .clog_init [y/N] " confirm
+  read -r -p "⚠  Remove clog from $(pwd)? Deletes .clog and .clog_init [y/N] " confirm
   if [[ "$confirm" =~ ^[Yy]$ ]]; then
     rm -f "$CLOG_FILE" "$CLOG_MARKER"
     echo "✔  clog removed from $(pwd)"
