@@ -77,7 +77,7 @@ fi
 git config --global core.excludesfile "$GLOBAL_GITIGNORE" 2>/dev/null || true
 
 echo ""
-echo "  ✅  clog installed successfully!"
+echo "   clog installed successfully!"
 echo ""
 
 if [ "$OS" == "mac" ]; then

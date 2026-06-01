@@ -57,7 +57,7 @@ elif [ "$OS" == "windows" ]; then
 fi
 
 echo ""
-echo "  ✅  clog uninstalled successfully!"
+echo "   clog uninstalled successfully!"
 echo ""
 echo "  Reload your shell:"
 echo "    source ~/.zshrc    (zsh)"
